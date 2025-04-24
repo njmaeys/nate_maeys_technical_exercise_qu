@@ -5,3 +5,6 @@ pydantic>=2.0
 python-dotenv
 pytest
 httpx
+
+# NOTE: I had to install this to make the sqlalchemy create_engine work
+psycopg2-binary

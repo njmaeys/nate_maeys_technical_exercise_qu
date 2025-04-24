@@ -1,5 +1,16 @@
 # Insights Service • Take‑Home Exercise
 
+# Nate's Quick Notes
+- I did everything using the docker container
+- I tried to leave a bunch of comments on through processes
+   - Anywhere you see `NOTE: <thing>` I'm calling out more details on decisions
+- Tests...
+   - The doc doesn't requests any tests but I do see a folder for it... in the interest of time I'm moving on and submitting. Happy to talk about this
+- I had to add an item to the requirements.txt... it's the only way I could get it to work
+- SQL... I created a SQL file with the create table statements
+   - I could have created a python script but in interest of time raw SQL was enough IMO
+
+
 Welcome! This starter repository contains just enough scaffolding so you can focus on the interesting parts:
 
 | Folder | Purpose |
