@@ -8,6 +8,7 @@ from app.models.electric_sensors import ElectricSensor
 class CircuitQueryModels:
     class CircuitSensorData(BaseModel):
         circuit_id: UUID
+        circuit_number: int
         circuit_name: str
         sensor_id: UUID
         sensor_duid: str
@@ -15,11 +16,13 @@ class CircuitQueryModels:
         sensor_location_id: UUID
 
 class CircuitsController:
-
-    def get_circuits_data_by_id(session, circuit_id: str):
+    def get_circuits_data_by_id(session, circuit_id: str) -> CircuitQueryModels.CircuitSensorData:
+        # Circuit ID appears to be unique and looks to tie to a single sensior.
+        # This means only a single sensor should be returned
         results = (
             session.query(
                 Circuit.id.label("circuit_id"),
+                Circuit.circuit_number.label("circuit_number"),
                 Circuit.name.label("circuit_name"),
                 ElectricSensor.id.label("sensor_id"),
                 ElectricSensor.duid.label("sensor_duid"),
@@ -28,8 +31,8 @@ class CircuitsController:
             )
             .join(ElectricSensor, Circuit.sensor_id == ElectricSensor.id)
             .filter(Circuit.id == circuit_id)
-            .all()
+            .first()
         )
 
-        return [CircuitQueryModels.CircuitSensorData(**row._asdict()) for row in results]
+        return CircuitQueryModels.CircuitSensorData(**results._asdict())
 
