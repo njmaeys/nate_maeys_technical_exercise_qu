@@ -6,5 +6,5 @@ python-dotenv
 pytest
 httpx
 
-# I had to install this to make the sqlalchemy create_engine work
+# NOTE: I had to install this to make the sqlalchemy create_engine work
 psycopg2-binary
