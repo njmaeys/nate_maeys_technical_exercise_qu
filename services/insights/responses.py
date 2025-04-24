@@ -1,8 +1,14 @@
 from pydantic import BaseModel
 from uuid import UUID
 
-# NOTE: This could be nested into objects of circuit and sensor.
-# Keeping top level for end user ease of access since this is a small endpoint.
+
+"""
+NOTE:
+These response models could def be nested and structured around items like
+the location or the circuit but keeping it simple for this exercise.
+"""
+
+
 class CircuitPowerUsageResponse(BaseModel):
     circuit_id: UUID
     circuit_number: int
@@ -11,3 +17,10 @@ class CircuitPowerUsageResponse(BaseModel):
     sensor_duid: str
     sensor_name: str
     wattage_consumed: int
+    average_wattage_consumed: float
+
+
+class CircuitPowerUsageByLocationResponse(BaseModel):
+    location_id: UUID
+    location_name: str
+    circuit_data: CircuitPowerUsageResponse
