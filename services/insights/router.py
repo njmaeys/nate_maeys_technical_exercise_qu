@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Path, Query, HTTPException
+import os
+from uuid import UUID
+from datetime import datetime
+from fastapi import APIRouter, Path, Query, HTTPException, Depends, Header
 from collections import defaultdict
 
 from app.db.session import SessionLocal
 from app.db.controllers.controller_all import CircuitsController, OrganizationsController
 from services.insights.ts_client import query
 from services.insights.responses import CircuitPowerUsageResponse, CircuitPowerUsageByLocationResponse
+
+from app.core.config import INTERNAL_API_KEY
 
 router=APIRouter(
     tags=['insights'],
@@ -27,22 +32,28 @@ But for simplicity and not really knowing what metatdata we may need I'm keeping
 striclty to the data that the consumer will need that I'm aware of.
 """
 
+async def verify_api_key(x_api_key: str = Header(None)):
+    if x_api_key != INTERNAL_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
+    return x_api_key
+
 
 @router.get(
     '/circuits/{circuit_id}/power-usage',
     description="Returns the total power in watts consumed by a circuit in the requested time period.",
     response_model=CircuitPowerUsageResponse,
+    dependencies=[Depends(verify_api_key)],
 )
 def circuits_power_usage_by_id(
-    circuit_id: str = Path(
+    circuit_id: UUID = Path(
         title="Circuit ID",
         description="The unique circuit ID to query. Format: UUID",
     ),
-    start_date_time: str = Query(
+    start_date_time: datetime = Query(
         default="",
         description="The timestamp to start the query at. Format example: 2024-04-01T22:00:00Z",
     ),
-    end_date_time: str = Query(
+    end_date_time: datetime = Query(
         default="",
         description="The timestamp to end the query at. Format example: 2024-04-01T22:28:00Z",
     ),
@@ -56,6 +67,12 @@ def circuits_power_usage_by_id(
             session=session,
             circuit_id=circuit_id,
         )
+
+        if not circuit_and_sensor_data:
+            raise HTTPException(
+                status_code=404,
+                detail="Circuit ID not found"
+            )
         
         # Pass in the appropriate circuit and sensor data for the TS data
         ts_data = query(
@@ -96,6 +113,7 @@ def circuits_power_usage_by_id(
     '/organizations/{organization_id}/power-usage/location',
     description="Returns the total and average power in watts consumed per location, per circuit.",
     response_model=list[CircuitPowerUsageByLocationResponse],
+    dependencies=[Depends(verify_api_key)],
 )
 def organization_power_usage_by_location_and_circuit(
     organization_id: str = Path(

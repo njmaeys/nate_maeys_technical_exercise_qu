@@ -45,6 +45,9 @@ class CircuitsController:
             .first()
         )
 
+        if not results:
+            return None
+
         return CircuitQueryModels.CircuitSensorData(**results._asdict())
 
     def get_sensors_by_location_ids(session, location_ids: list[str]) -> CircuitQueryModels.CircuitSensorData:

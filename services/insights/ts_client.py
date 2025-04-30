@@ -11,9 +11,9 @@ do the filtering on a massive data set when I could make the TimeSeries client d
 
 I assumed it was ok to do so since the start and end params were here but doing nothing...
 """
-def query(duid: str, circuit: int, start: str, end: str):
-    start_dt = datetime.fromisoformat(start.replace("Z", "+00:00"))
-    end_dt = datetime.fromisoformat(end.replace("Z", "+00:00"))
+def query(duid: str, circuit: int, start: datetime, end: datetime):
+    start_dt = start
+    end_dt = end
 
     return [
         row for row in DATA
